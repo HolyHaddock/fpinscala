@@ -139,10 +139,42 @@ object PolymorphicFunctions {
     go(0, 0, as.length - 1)
   }
 
+  import scala.annotation.tailrec
+
   // Exercise 2: Implement a polymorphic function to check whether 
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ??? 
-  
+  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
+    @tailrec
+    def isSortedImpl(i: Int): Boolean = {
+      (i + 1 >= as.length) || (gt(as(i+1), as(i)) && isSortedImpl(i+1))
+    }
+
+    isSortedImpl(0)
+  }
+
+
+  /*
+  val gt = (a: Int, b: Int) => a > b
+
+  scala> isSorted(Array.empty, gt)
+  res3: Boolean = true
+
+  scala> isSorted(Array(1), gt)
+  res4: Boolean = true
+
+  scala> isSorted(Array(1, 2), gt)
+  res5: Boolean = true
+
+  scala> isSorted(Array(1, 2, 3, 4, 5), gt)
+  res6: Boolean = true
+
+  scala> isSorted(Array(1, 2, 3, 5, 4), gt)
+  res7: Boolean = false
+
+  scala> isSorted(Array(2, 1, 3, 4, 5), gt)
+  res8: Boolean = false
+   */
+
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
 
