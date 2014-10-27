@@ -180,16 +180,13 @@ object PolymorphicFunctions {
 
   // Exercise 3: Implement `partial1`.
   
-  def partial1[A,B,C](a: A, f: (A,B) => C): B => C = {
-    (b: B) => f(a, b)
-  }
+  def partial1[A,B,C](a: A, f: (A,B) => C): B => C = (b: B) => f(a, b)
   
   // Exercise 4: Implement `curry`.
 
   // Note that `=>` associates to the right, so we could 
   // write the return type as `A => B => C`
-  def curry[A,B,C](f: (A, B) => C): A => (B => C) =
-    ??? 
+  def curry[A,B,C](f: (A, B) => C): A => (B => C) = (a: A) => (b: B) => f(a,b)
 
   // NB: The `Function2` trait has a `curried` method already
 
