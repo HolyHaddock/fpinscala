@@ -100,5 +100,8 @@ object List { // `List` companion object
 
   def stringify(l : List[Double]) = foldRight(l, Nil: List[String])((x, acc) => Cons(x.toString, acc))
 
-  def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
+  def map[A,B](l: List[A])(f: A => B): List[B] = l match {
+    case Nil => Nil
+    case Cons(h, t) => Cons(f(h), map(t)(f))
+  }
 }
