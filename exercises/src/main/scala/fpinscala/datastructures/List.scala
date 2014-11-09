@@ -98,5 +98,7 @@ object List { // `List` companion object
 
   def add1(l: List[Int]) = foldRight(l, Nil: List[Int])((x, acc) => Cons(x + 1, acc))
 
+  def stringify(l : List[Double]) = foldRight(l, Nil: List[String])((x, acc) => Cons(x.toString, acc))
+
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
 }
