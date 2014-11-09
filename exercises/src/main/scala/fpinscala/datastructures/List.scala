@@ -56,7 +56,7 @@ object List { // `List` companion object
     case nil => nil           // This could be a throw, making tail non-total, and less useful.
   }
 
-  def drop[A](l: List[A], n: Int): List[A] = sys.error("todo")
+  def drop[A](l: List[A], n: Int): List[A] = if (n == 0) l else drop(tail(l), n-1)
 
   def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = sys.error("todo")
 
