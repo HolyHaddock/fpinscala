@@ -60,7 +60,7 @@ object List { // `List` companion object
 
   def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = sys.error("todo")
 
-  def setHead[A](l: List[A])(h: A): List[A] = sys.error("todo")
+  def setHead[A](l: List[A])(h: A): List[A] = Cons(h, tail(l))
 
   def init[A](l: List[A]): List[A] = sys.error("todo")
 
