@@ -104,4 +104,6 @@ object List { // `List` companion object
     case Nil => Nil
     case Cons(h, t) => Cons(f(h), map(t)(f))
   }
+
+  def filter[A](l: List[A])(p: A => Boolean) = foldRight(l, Nil: List[A])((x, acc) => if (p(x)) Cons(x, acc) else acc)
 }
