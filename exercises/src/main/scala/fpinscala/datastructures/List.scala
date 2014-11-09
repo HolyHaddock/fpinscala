@@ -85,6 +85,11 @@ object List { // `List` companion object
   def productLeft(l : List[Double]) = foldLeft(l, 1.0)(_ * _)
   def lengthLeft[A](l :List[A]) = foldLeft(l, 0)((len, _) => len + 1)
 
+  def foldLeftUsingRight[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+    def linkChain(a: A, g: B => B) = (acc: B) => g(f(acc, a))
+    foldRight(l, (b: B) => b)(linkChain)(z)
+  }
+
   def reverse[A](l : List[A]) = foldLeft(l, Nil: List[A])((listSoFar, item) => Cons(item,listSoFar))
 
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
