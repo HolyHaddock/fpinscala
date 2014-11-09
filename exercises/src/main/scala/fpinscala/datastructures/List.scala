@@ -110,4 +110,9 @@ object List { // `List` companion object
   def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = foldRight(as, Nil: List[B])((x, acc) => append(f(x), acc))
 
   def filterUsingFlatmap[A](l : List[A])(p: A => Boolean) = flatMap(l)(x => if (p(x)) List(x) else Nil)
+
+  def addTwoLists(l1: List[Int], l2 : List[Int]): List[Int] = (l1, l2) match {
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addTwoLists(t1, t2))
+    case _ => Nil
+  }
 }
