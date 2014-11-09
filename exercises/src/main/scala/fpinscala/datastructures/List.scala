@@ -53,7 +53,7 @@ object List { // `List` companion object
 
   def tail[A](l: List[A]): List[A] = l match {
     case Cons(_, t) => t
-    case nil => nil
+    case nil => nil           // This could be a throw, making tail non-total, and less useful.
   }
 
   def drop[A](l: List[A], n: Int): List[A] = sys.error("todo")
