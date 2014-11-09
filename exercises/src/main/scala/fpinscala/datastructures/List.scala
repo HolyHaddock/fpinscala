@@ -90,6 +90,8 @@ object List { // `List` companion object
     foldRight(l, (b: B) => b)(linkChain)(z)
   }
 
+  def appendUsingFold[A](a1: List[A], a2: List[A]): List[A] = foldRight(a1, a2)(Cons(_,_))
+
   def reverse[A](l : List[A]) = foldLeft(l, Nil: List[A])((listSoFar, item) => Cons(item,listSoFar))
 
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
