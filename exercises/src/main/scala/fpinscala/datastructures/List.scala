@@ -120,4 +120,11 @@ object List { // `List` companion object
     case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(t1, t2)(f))
     case _ => Nil
   }
+
+  def hasSubSequence[A](haystack: List[A], needle: List[A]): Boolean = (haystack, needle) match {
+    case (Cons(h1, t1), Cons(h2, t2)) if h1 == h2 => hasSubSequence(t1, t2) || hasSubSequence(t1, needle)
+    case (Cons(h1, t1), Cons(h2, t2)) => hasSubSequence(t1, needle)
+    case (_, Nil) => true
+    case (Nil, _) => false
+  }
 }
