@@ -81,5 +81,9 @@ object List { // `List` companion object
     case Cons(h, t) => foldLeft(t, f(z, h))(f)
   }
 
+  def sumLeft(l : List[Int]) = foldLeft(l, 0)(_ + _)
+  def productLeft(l : List[Double]) = foldLeft(l, 1.0)(_ * _)
+  def lengthLeft[A](l :List[A]) = foldLeft(l, 0)((len, _) => len + 1)
+
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
 }
