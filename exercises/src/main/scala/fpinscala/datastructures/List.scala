@@ -58,7 +58,10 @@ object List { // `List` companion object
 
   def drop[A](l: List[A], n: Int): List[A] = if (n == 0) l else drop(tail(l), n-1)
 
-  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = sys.error("todo")
+  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    case Cons(h, t) if f(h) => dropWhile(t)(f)
+    case _ => l
+  }
 
   def setHead[A](l: List[A])(h: A): List[A] = Cons(h, tail(l))
 
