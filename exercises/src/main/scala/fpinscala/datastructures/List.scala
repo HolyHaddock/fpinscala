@@ -94,5 +94,7 @@ object List { // `List` companion object
 
   def reverse[A](l : List[A]) = foldLeft(l, Nil: List[A])((listSoFar, item) => Cons(item,listSoFar))
 
+  def flatten[A](ls: List[List[A]]) = foldRight(ls, Nil: List[A])(append)
+
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
 }
