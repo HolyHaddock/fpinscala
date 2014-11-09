@@ -65,7 +65,11 @@ object List { // `List` companion object
 
   def setHead[A](l: List[A])(h: A): List[A] = Cons(h, tail(l))
 
-  def init[A](l: List[A]): List[A] = sys.error("todo")
+  def init[A](l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case Cons(h, Nil) => Nil
+    case Cons(h, t) => Cons(h, init(t))
+  }
 
   def length[A](l: List[A]): Int = sys.error("todo")
 
