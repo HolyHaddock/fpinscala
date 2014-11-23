@@ -6,6 +6,9 @@ val o1 = Some("hello")
 val o2: Opt[String] = None
 val o3 = Some(" world")
 
+// Exercise 4.4:
+Opt.sequence(List(o1, o2, o3))
+Opt.sequence(List(o1, o3))
 // Exercise 4.3:
 
 Opt.map2(o1, o2)(_ + _)
