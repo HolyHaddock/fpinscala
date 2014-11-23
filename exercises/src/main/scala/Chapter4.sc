@@ -19,6 +19,13 @@ e1.orElse(e2)
 e1.orElse(e3)
 
 e1.map2(e3) (_ + _)
+
+Either.sequence(List(e1, e2, e3))
+Either.sequence(List(e1, e3))
+
+Either.traverse(List("1", "2", "3", "4")) {s => Either(s.toInt)}
+Either.traverse(List("1", "2", "three", "4")) {s => Either(s.toInt)}
+
 // Examples
 val o1 = Some("hello")
 val o2: Opt[String] = None

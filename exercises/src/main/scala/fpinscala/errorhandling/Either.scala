@@ -37,4 +37,14 @@ object Either {
       case e: Exception => Left(e)
     }
 
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] = es.foldRight(Right(List.empty[A]) : Either[E, List[A]]) {
+    case (e, acc) => e.flatMap(b => acc.map(bs => b +: bs))
+  }
+  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] = as.foldRight(Right(List.empty[B]) : Either[E, List[B]]) {
+    case (a, e) => e.flatMap(bs => f(a).map(b => b +: bs))
+  }
+
+  def apply[A](a: => A): Either[Exception, A] = try Right(a)
+                                              catch { case e: Exception => Left(e) }
+
 }
