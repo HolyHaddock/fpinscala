@@ -21,6 +21,11 @@ case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
 
 object Option {
+
+  def Try[A](a: => A): Option[A] =
+    try Some(a)
+    catch { case e: Exception => None }
+
   def failingFn(i: Int): Int = {
     val x: Int = throw new Exception("fail!")
     try {
@@ -79,5 +84,7 @@ object Option {
     (opt, acc) => opt.flatMap( x => acc.map(x :: _))
   }
 
-  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = sys.error("todo")
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a.foldRight(Some(List.empty[B]) : Option[List[B]]) {
+    (item, acc) => acc.flatMap( ls => f(item).map(x => x +: ls))
+  }
 }
