@@ -23,3 +23,7 @@ o1 orElse o3
 o1 filter(_.forall(_.isLower))
 o1 filter(_ == "treasure!")
 
+// Exercise 4.2:
+
+Opt.variance(Seq(2.0, 3.0, 4.0))
+Opt.variance(Seq())

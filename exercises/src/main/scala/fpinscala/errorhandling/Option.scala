@@ -66,7 +66,9 @@ object Option {
     mkMatcher(pat) flatMap (f => 
     mkMatcher(pat2) map     (g => 
     f(s) && g(s)))
-  def variance(xs: Seq[Double]): Option[Double] = sys.error("todo")
+  def variance(xs: Seq[Double]): Option[Double] =
+    for {meanOfxSquared <- mean(xs.map(x => x*x))
+         meanOfX <- mean(xs)} yield meanOfxSquared - (meanOfX * meanOfX)
 
   def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = sys.error("todo")
 
