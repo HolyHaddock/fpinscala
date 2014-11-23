@@ -1,10 +1,23 @@
 import fpinscala.errorhandling.{Option => Opt, _}
 
-// Exercise 4.1:
+// Examples
 
-val o1 = Some("test")
+val o1 = Some("hello")
 val o2: Opt[String] = None
-val o3 = Some("something else")
+val o3 = Some(" world")
+
+// Exercise 4.3:
+
+Opt.map2(o1, o2)(_ + _)
+Opt.map2(o1, o3)(_ + _)
+
+// Exercise 4.2:
+
+Opt.variance(Seq(2.0, 3.0, 4.0))
+Opt.variance(Seq())
+
+
+// Exercise 4.1:
 
 o1.map(_.toUpperCase)
 o2.map(_.toUpperCase)
@@ -22,8 +35,3 @@ o1 orElse o3
 
 o1 filter(_.forall(_.isLower))
 o1 filter(_ == "treasure!")
-
-// Exercise 4.2:
-
-Opt.variance(Seq(2.0, 3.0, 4.0))
-Opt.variance(Seq())

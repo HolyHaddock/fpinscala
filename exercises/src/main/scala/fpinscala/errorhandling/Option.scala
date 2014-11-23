@@ -70,7 +70,8 @@ object Option {
     for {meanOfxSquared <- mean(xs.map(x => x*x))
          meanOfX <- mean(xs)} yield meanOfxSquared - (meanOfX * meanOfX)
 
-  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = sys.error("todo")
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = a.flatMap { a_ =>
+                                                                             b.map { b_ => f(a_,b_)}}
 
   def bothMatch_2(pat1: String, pat2: String, s: String): Option[Boolean] = sys.error("todo")
 
