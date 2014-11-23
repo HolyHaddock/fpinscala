@@ -48,3 +48,13 @@ object Either {
                                               catch { case e: Exception => Left(e) }
 
 }
+
+
+/* Exercise 4.8
+
+To capture all the errors, you could make the Left side a collection of some kind - the equivalent of Either[List[E], A].
+This would require changing mkPerson to return an Either[List[String], Person], and map2 to return Either[List[EE], A]. The errors would have to have a useful
+lowest supertype - Exception or some such.
+orElse, traverse and sequence would not be able to use any laziness - in order to capture all the errors, all the elements of the list would have to be evaluated.
+
+ */
