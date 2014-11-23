@@ -22,7 +22,7 @@ case object None extends Option[Nothing]
 
 object Option {
 
-  def Try[A](a: => A): Option[A] =
+  def apply[A](a: => A): Option[A] =
     try Some(a)
     catch { case e: Exception => None }
 
