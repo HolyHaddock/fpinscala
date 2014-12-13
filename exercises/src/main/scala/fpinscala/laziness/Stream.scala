@@ -28,7 +28,11 @@ trait Stream[+A] {
     case _ => empty
   }
 
-  def forAll(p: A => Boolean): Boolean = sys.error("todo")
+  def forAll(p: A => Boolean): Boolean = uncons match {
+    case Some((h, t)) if p(h) => t.forAll(p)
+    case None => true
+    case _ => false
+  }
 
   def toList: List[A] = foldRight(Nil: List[A]){ (x, acc) => x :: acc }
 }

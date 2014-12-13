@@ -10,3 +10,6 @@ empty.toList
 example.take(3).toList
 example.drop(3).toList
 example.takeWhile(_ != 3).toList
+
+example.forAll(_ > 3)
+example.forAll(_ < 6)
