@@ -13,11 +13,24 @@ trait Stream[+A] {
 
   def exists(p: A => Boolean): Boolean = 
     foldRight(false)((a, b) => p(a) || b)
-  def take(n: Int): Stream[A] = sys.error("todo")
 
-  def takeWhile(p: A => Boolean): Stream[A] = sys.error("todo")
+  def take(n: Int): Stream[A] = uncons match {
+    case Some((h, t)) if n > 0 => cons(h, t.take(n-1))
+    case _ => empty
+  }
+  def drop(n: Int): Stream[A] = uncons match {
+    case Some((h, t)) if n > 0 => t.drop(n-1)
+    case _ => this
+  }
+
+  def takeWhile(p: A => Boolean): Stream[A] = uncons match {
+    case Some((h, t)) if p(h) => cons(h, t.takeWhile(p))
+    case _ => empty
+  }
 
   def forAll(p: A => Boolean): Boolean = sys.error("todo")
+
+  def toList: List[A] = foldRight(Nil: List[A]){ (x, acc) => x :: acc }
 }
 object Stream {
   def empty[A]: Stream[A] = 
