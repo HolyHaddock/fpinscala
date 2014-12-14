@@ -13,17 +13,9 @@ trait Functor[F[_]] {
   def distribute[A,B](fab: F[(A, B)]): (F[A], F[B]) =
     (map(fab)(_._1), map(fab)(_._2))
 
-  // It turns out that `cofactor` can be implemented with just `map`.
-  // We did not need the full power of monads in this case. It's important
-  // to note that we are just playing here, and sometimes when playing we
-  // discover something unexpected. This method rightly belongs on `Functor`.
-  // What it does: It takes _one_ value, either of type M[A] or M[B] and returns
-  // that same value except with the value(s) inside wrapped in Left or Right
-  // according to whether the argument was Left or Right. I.e. it moves a Left
-  // or Right constructor from the outside to the inside of an M.
-  def cofactor[A,B](e: Either[F[A], F[B]]): F[Either[A, B]] = e match {
-    case Left(ma) => map(ma)(Left(_))
-    case Right(mb) => map(mb)(Right(_))
+  def codistribute[A,B](e: Either[F[A], F[B]]): F[Either[A, B]] = e match {
+    case Left(fa) => map(fa)(Left(_))
+    case Right(fb) => map(fb)(Right(_))
   }
 }
 
@@ -33,21 +25,21 @@ object Functor {
   }
 }
 
-trait Monad[M[_]] extends Functor[M] {
-  def unit[A](a: => A): M[A]
+trait Monad[F[_]] extends Functor[F] {
+  def unit[A](a: => A): F[A]
 
-  def flatMap[A,B](ma: M[A])(f: A => M[B]): M[B] =
+  def flatMap[A,B](ma: F[A])(f: A => F[B]): F[B] =
     join(map(ma)(f))
 
-  def map[A,B](ma: M[A])(f: A => B): M[B] =
+  def map[A,B](ma: F[A])(f: A => B): F[B] =
     flatMap(ma)(a => unit(f(a)))
-  def map2[A,B,C](ma: M[A], mb: M[B])(f: (A, B) => C): M[C] =
+  def map2[A,B,C](ma: F[A], mb: F[B])(f: (A, B) => C): F[C] =
     flatMap(ma)(a => map(mb)(b => f(a, b)))
 
-  def sequence[A](lma: List[M[A]]): M[List[A]] =
+  def sequence[A](lma: List[F[A]]): F[List[A]] =
     lma.foldRight(unit(List[A]()))((ma, mla) => map2(ma, mla)(_ :: _))
 
-  def traverse[A,B](la: List[A])(f: A => M[B]): M[List[B]] =
+  def traverse[A,B](la: List[A])(f: A => F[B]): F[List[B]] =
     la.foldRight(unit(List[B]()))((a, mlb) => map2(f(a), mlb)(_ :: _))
 
   // For `List`, the `replicateM` function will generate a list of lists.
@@ -62,22 +54,25 @@ trait Monad[M[_]] extends Functor[M] {
   // determines how values are actually combined.
 
   // Recursive version:
-  def _replicateM[A](n: Int, ma: M[A]): M[List[A]] =
+  def _replicateM[A](n: Int, ma: F[A]): F[List[A]] =
     if (n <= 0) unit(List[A]()) else map2(ma, replicateM(n - 1, ma))(_ :: _)
 
   // Using `sequence` and the `List.fill` function of the standard library:
-  def replicateM[A](n: Int, ma: M[A]): M[List[A]] =
+  def replicateM[A](n: Int, ma: F[A]): F[List[A]] =
     sequence(List.fill(n)(ma))
 
 
-  def compose[A,B,C](f: A => M[B], g: B => M[C]): A => M[C] =
+  def compose[A,B,C](f: A => F[B], g: B => F[C]): A => F[C] =
     a => flatMap(f(a))(g)
 
-  def _flatMap[A,B](ma: M[A])(f: A => M[B]): M[B] =
+  def _flatMap[A,B](ma: F[A])(f: A => F[B]): F[B] =
     compose((_:Unit) => ma, f)(())
 
-  def join[A](mma: M[M[A]]): M[A] = flatMap(mma)(ma => ma)
+  def join[A](mma: F[F[A]]): F[A] = flatMap(mma)(ma => ma)
 
+  def filterM[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] =
+    ms.foldRight(unit(List[A]()))((x,y) =>
+      compose(f, (b: Boolean) => if (b) map2(unit(x),y)(_ :: _) else y)(x))
 }
 
 case class Reader[R, A](run: R => A)
@@ -143,6 +138,18 @@ object Monad {
     def unit[A](a: => A) = Id(a)
     override def flatMap[A,B](ida: Id[A])(f: A => Id[B]): Id[B] = ida flatMap f
   }
+
+  def getState[S]: State[S,S] = State(s => (s,s))
+  def setState[S](s: S): State[S,Unit] = State(_ => ((),s))
+
+  val F = stateMonad[Int]
+
+  def zipWithIndex[A](as: List[A]): List[(Int,A)] =
+    as.foldLeft(F.unit(List[(Int, A)]()))((acc,a) => for {
+      xs <- acc
+      n  <- getState
+      _  <- setState(n + 1)
+    } yield (n, a) :: xs).run(0)._1.reverse
 
   // The action of Reader's `flatMap` is to pass the `r` argument along to both the
   // outer Reader and also to the result of `f`, the inner Reader. Similar to how

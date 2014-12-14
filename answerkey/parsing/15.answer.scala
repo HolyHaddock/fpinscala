@@ -1,3 +1,1 @@
-`seq` distributes over `kor`, much like multiplication distributes over addition:
-
-  seq(a, kor(b,c)) == kor(seq(a,b), seq(a,c))
+Again see reference implementation here https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/instances/Reference.scala

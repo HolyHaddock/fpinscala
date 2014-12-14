@@ -1,5 +1,5 @@
-def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] =
-  f(z) match {
-    case Some((h,t)) => cons(h, unfold(t)(f))
-    case None => empty
-  }
+val fibs = {
+  def go(f0: Int, f1: Int): Stream[Int] = 
+    cons(f0, go(f1, f0+f1))
+  go(0, 1)
+}

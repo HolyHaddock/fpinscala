@@ -1,2 +1,3 @@
-def reverse[A](fa: F[A]): F[A] =
-  mapAccum(fa, toList(fa))((_, as) => (as.head, as.tail))._1
+def sequenceMap[F[_],K,V](ofa: Map[K,F[V]]): F[Map[K,V]] =
+  ofa.foldLeft(unit(Map()))((acc, (k, fv)) =>
+    apply(map(acc)(m => n => m ++ n))(map(fv)(Map(k -> _))))

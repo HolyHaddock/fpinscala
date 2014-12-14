@@ -1,2 +1,2 @@
-def listOf[A](g: Gen[A]): SGen[List[A]] = 
-  SGen(n => g.listOfN(n))
+/* A detailed answer is to be found in the file Exhaustive.scala in the code
+   accompanying this chapter. */

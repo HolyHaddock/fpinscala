@@ -1,4 +1,1 @@
-val sortedProp = forAll(listOf(smallInt)) { l => 
-  val ls = l.sorted
-  l.isEmpty || !l.zip(l.tail).exists { case (a,b) => a > b }
-}
+This is an open-ended exercise and we don't give an answer here.

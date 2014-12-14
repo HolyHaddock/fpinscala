@@ -1,11 +1,6 @@
-It's because `foldRight`, `foldLeft`, and `foldMap` do not give us any way of constructing a value of the foldable type. In order to `map` over a structure, you need the ability to create a new structure (such as `Nil` and `Cons` in the case of a `List`). `Traverse` is able to extend `Functor` precisely because a traversal preserves the original structure. In short: `Foldable[F]` is essentially a homomorphism from `F` to `List`, but this is not always an isomorphism.
+You want to try writing `flatMap` in terms of `Monad[F]` and `Monad[G]`.
 
-An example of a Foldable that is not a functor:
+def flatMap[A,B](mna: F[G[A]])(f: A => F[G[B]]): F[G[B]] =
+  self.flatMap(na => G.flatMap(na)(a => ???))
 
-case class Iteration[A](a: A, f: A => A, n: Int) {
-  def foldMap[B](g: A => B)(M: Monoid[B]): B = {
-    def iterate(n: Int, b: B, c: A): B =
-      if (n <= 0) b else iterate(n-1, g(c), f(a))
-    iterate(n, M.zero, a)
-  }
-}
+Here all you have is `f`, which returns an `F[G[B]]`. For it to have the appropriate type to return from the argument to `G.flatMap`, you'd need to be able to "swap" the `F` and `G` types. In other words, you'd need a _distributive law_. Such an operation is not part of the `Monad` interface.

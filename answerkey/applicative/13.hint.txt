@@ -1,1 +1,1 @@
-This implementation is very similar to `toList` except instead of accumulating into a list, we are accumulating into a `B` using the `f` function.
+Follow the types. There is generally only one sensible implementation that typechecks.
