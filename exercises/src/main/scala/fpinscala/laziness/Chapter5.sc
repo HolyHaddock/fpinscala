@@ -33,3 +33,8 @@ constant(2).take(3).toList
 Stream.from(5).take(5).toList
 
 Stream.fibs.take(10).toList
+
+Stream.UsingUnfold.constant(10).take(5).toList
+Stream.UsingUnfold.ones.take(5).toList
+Stream.UsingUnfold.fibs.take(10).toList
+Stream.UsingUnfold.from(10).take(5).toList
