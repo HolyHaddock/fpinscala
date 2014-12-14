@@ -45,6 +45,16 @@ trait Stream[+A] {
     case (i1, i2) => i1 == i2
   }
 
+  def tails: Stream[Stream[A]] = unfold(this) {
+    case Empty => None
+    case c@Cons(h,t) => Some((c, t()))
+  }
+
+  def scanRight[B](z: => B)(f: (A, => B) => B):Stream[B] = foldRight((z, Stream(z))) { (a, s) =>
+    val nextS = f(a, s._1)
+    (nextS, cons(nextS, s._2))
+  }._2
+
   def headOption = foldRight(None: Option[A])((a, _) => Some(a))
 
   def toList: List[A] = foldRight(Nil: List[A]){ (x, acc) => x :: acc }
