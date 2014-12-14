@@ -41,6 +41,8 @@ trait Stream[+A] {
   }
 
   def startsWith[B](s: Stream[B]): Boolean = sys.error("todo")
+
+  def headOption = foldRight(None: Option[A])((a, _) => Some(a))
   
   def toList: List[A] = foldRight(Nil: List[A]){ (x, acc) => x :: acc }
 }
