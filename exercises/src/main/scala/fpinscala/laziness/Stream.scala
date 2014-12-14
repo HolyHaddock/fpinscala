@@ -2,6 +2,7 @@ package fpinscala.laziness
 
 import Stream._
 trait Stream[+A] {
+  stream =>
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
     this match {
@@ -9,7 +10,7 @@ trait Stream[+A] {
       case _ => z
     }
 
-  def exists(p: A => Boolean): Boolean = 
+  def exists(p: A => Boolean): Boolean =
     foldRight(false)((a, b) => p(a) || b)
 
   @annotation.tailrec
@@ -43,7 +44,7 @@ trait Stream[+A] {
   def startsWith[B](s: Stream[B]): Boolean = sys.error("todo")
 
   def headOption = foldRight(None: Option[A])((a, _) => Some(a))
-  
+
   def toList: List[A] = foldRight(Nil: List[A]){ (x, acc) => x :: acc }
 
   def map[B](f: A => B) = foldRight(empty[B]) {
@@ -58,6 +59,35 @@ trait Stream[+A] {
 
   def append[B>:A](other: =>Stream[B]) = foldRight(other)((a, acc) => cons(a, acc))
 
+
+  object FromUnfold {
+    def map[B](f: A => B) = unfold(stream) {
+      case Cons(h, t) => Some((f(h()), t()))
+      case Empty => None
+    }
+
+    def take(n: Int): Stream[A] = unfold(stream) {
+      case Cons(h, t) if n > 0 => Some((h(), t().FromUnfold.take(n-1)))
+      case _ => None
+    }
+
+    def takeWhile(p: A => Boolean): Stream[A] = unfold(stream) {
+      case Cons(h, t) if p(h()) => Some(h(), t().takeWhile(p))
+      case _ => None
+    }
+
+    def zipWith[B](s: Stream[B]): Stream[(A, B)] = unfold((stream, s)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some((h1(), h2()), (t1(), t2()))
+      case _ => None
+    }
+
+    def zipAll[B](s2: Stream[B]): Stream[(Option[A],Option[B])] = unfold((stream, s2)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some((Some(h1()), Some(h2())), (t1(), t2()))
+      case (Cons(h, t), Empty) => Some((Some(h()), None), (t(), empty[B]))
+      case (Empty, Cons(h, t)) => Some((None, Some(h())), (empty[A], t()))
+      case _ => None
+    }
+  }
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]

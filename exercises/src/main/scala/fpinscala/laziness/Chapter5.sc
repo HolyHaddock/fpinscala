@@ -38,3 +38,19 @@ Stream.UsingUnfold.constant(10).take(5).toList
 Stream.UsingUnfold.ones.take(5).toList
 Stream.UsingUnfold.fibs.take(10).toList
 Stream.UsingUnfold.from(10).take(5).toList
+
+example.FromUnfold.map(_ - 5).toList
+
+example.FromUnfold.take(3).toList
+
+example.FromUnfold.takeWhile(_ != 3).toList
+
+example.FromUnfold.zipWith(Stream(10, 9, 8, 7, 6, 5)).toList
+
+example.FromUnfold.zipWith(Stream(1)).toList
+
+example.FromUnfold.zipWith(Stream(1,2,3,4,5,6)).toList
+
+example.FromUnfold.zipAll(Stream(1)).toList
+
+example.FromUnfold.zipAll(Stream(1,2,3,4,5,6)).toList
