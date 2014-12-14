@@ -84,5 +84,12 @@ object Stream {
 
   def from(n: Int): Stream[Int] = cons(n, from(n+1))
 
+  def fibs = {
+    def fibBuilder(o1: Int, o2: Int): Stream[Int] = {
+      cons(o2, fibBuilder(o2, o1 + o2))
+    }
+    fibBuilder(0, 1)
+  }
+
   def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = sys.error("todo")
 }
