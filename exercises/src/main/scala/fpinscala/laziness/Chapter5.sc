@@ -29,3 +29,5 @@ example.append(Stream(6,7,8)).toList
 example.flatMap(i => Stream(i*2, i*3, i*4)).toList
 
 constant(2).take(3).toList
+
+Stream.from(5).take(5).toList
