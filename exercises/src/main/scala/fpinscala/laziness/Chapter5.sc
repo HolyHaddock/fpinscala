@@ -54,3 +54,7 @@ example.FromUnfold.zipWith(Stream(1,2,3,4,5,6)).toList
 example.FromUnfold.zipAll(Stream(1)).toList
 
 example.FromUnfold.zipAll(Stream(1,2,3,4,5,6)).toList
+
+example.startsWith(Stream(1,2,3))
+example.startsWith(Stream(1,2,3,4,5,6))
+example.startsWith(Stream(1,7))

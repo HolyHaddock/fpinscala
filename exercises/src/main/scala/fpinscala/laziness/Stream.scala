@@ -41,7 +41,9 @@ trait Stream[+A] {
     (a, acc) => p(a) && acc
   }
 
-  def startsWith[B](s: Stream[B]): Boolean = sys.error("todo")
+  def startsWith[B](s: Stream[B]): Boolean = this.FromUnfold.zipAll(s).takeWhile(_._2.isDefined).forAll {
+    case (i1, i2) => i1 == i2
+  }
 
   def headOption = foldRight(None: Option[A])((a, _) => Some(a))
 
