@@ -28,6 +28,10 @@ trait Stream[+A] {
     case _ => empty
   }
 
+  def takeWhile2(p: A => Boolean): Stream[A] = foldRight(empty: Stream[A]) {
+    (a, acc) => if (p(a)) cons(a, acc) else empty
+  }
+
   def forAll(p: A => Boolean): Boolean = uncons match {
     case Some((h, t)) if p(h) => t.forAll(p)
     case None => true
