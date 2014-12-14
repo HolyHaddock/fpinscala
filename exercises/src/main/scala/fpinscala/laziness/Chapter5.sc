@@ -27,3 +27,5 @@ example.filter(_ % 2 == 0).toList
 example.append(Stream(6,7,8)).toList
 
 example.flatMap(i => Stream(i*2, i*3, i*4)).toList
+
+constant(2).take(3).toList
