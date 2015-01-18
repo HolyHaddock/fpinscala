@@ -1,5 +1,7 @@
 package fpinscala.state
 
+import scala.annotation.tailrec
+
 
 trait RNG {
   def nextInt: (Int, RNG) // Should generate a random `Int`. We'll later define other functions in terms of `nextInt`.
@@ -30,17 +32,47 @@ object RNG {
       (f(a), rng2)
     }
 
-  def nonNegativeInt(rng: RNG): (Int, RNG) = ???
+  @tailrec
+  def nonNegativeInt(rng: RNG): (Int, RNG) = {
+    val x = rng.nextInt
+    if (x._1 == Int.MinValue) nonNegativeInt(x._2) else (Math.abs(x._1), x._2)
+  }
 
-  def double(rng: RNG): (Double, RNG) = ???
+  def double(rng: RNG): (Double, RNG) = {
+    val x = rng.nextInt
+    (Math.abs(x._1.toDouble) / Math.abs(Int.MinValue.toDouble), x._2)
+  }
 
-  def intDouble(rng: RNG): ((Int,Double), RNG) = ???
+  val doubleFromMap = map(nonNegativeInt) {
+    i => i.toDouble / Math.abs(Int.MinValue.toDouble)
+  }
 
-  def doubleInt(rng: RNG): ((Double,Int), RNG) = ???
+  def intDouble(rng: RNG): ((Int,Double), RNG) = {
+    val (i, nextRng) = rng.nextInt
+    val (d, resultRng) = double(nextRng)
+    ((i, d), resultRng)
+  }
 
-  def double3(rng: RNG): ((Double,Double,Double), RNG) = ???
+  def doubleInt(rng: RNG): ((Double,Int), RNG) = {
+    val (d, nextRng) = double(rng)
+    val (i, resultRng) = nextRng.nextInt
+    ((d, i), resultRng)
+  }
 
-  def ints(count: Int)(rng: RNG): (List[Int], RNG) = ???
+  def double3(rng1: RNG): ((Double,Double,Double), RNG) = {
+    val (d1, rng2) = double(rng1)
+    val (d2, rng3) = double(rng2)
+    val (d3, rng4) = double(rng3)
+    ((d1, d2, d3), rng4)
+  }
+
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
+    if (count == 0) (List.empty, rng) else {
+      val (i, nextRng) = rng.nextInt
+      val (l, resultRng) = ints(count - 1)(nextRng)
+      (i +: l, resultRng)
+    }
+  }
 
   def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
 
@@ -67,4 +99,20 @@ case class Machine(locked: Boolean, candies: Int, coins: Int)
 object State {
   type Rand[A] = State[RNG, A]
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+}
+
+
+object Test extends App {
+  import fpinscala.state.RNG._
+
+  val rng = Simple(Int.MinValue)
+
+  println(RNG.nonNegativeInt(rng))
+  println(RNG.double(rng))
+  println(RNG.intDouble(rng))
+  println(RNG.doubleInt(rng))
+  println(RNG.double3(rng))
+  println(RNG.ints(5)(rng))
+
+  println(RNG.doubleFromMap(rng))
 }
