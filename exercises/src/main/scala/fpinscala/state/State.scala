@@ -125,8 +125,35 @@ object State {
   def unit[S, A](a: A): State[S, A] =
     State(s => (a, s))
 
+  def get[S]: State[S, S] = State(s => (s, s))
+
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+
+  def modify[S](f: S => S): State[S, Unit] = for { s <- get
+                                                   _ <- set(f(s)) } yield ()
+
+  def sequence[S, A](fs: List[State[S, A]]): State[S, List[A]] = {
+    State[S, List[A]] { (s: S) =>
+      fs.foldLeft((List.empty[A], s)) { (b, sa) =>
+        val (la, s2) = b
+        val (a, s3) = sa.run(s2)
+        (a +: la, s3)
+      }
+    }
+  }
+
   type Rand[A] = State[RNG, A]
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = {
+    def simulate(input: Input): State[Machine, Unit] = modify { m: Machine =>
+      input match {
+      case Coin if m.locked && m.candies > 0 => m.copy(locked = false, coins = m.coins + 1)
+      case Turn if !m.locked => m.copy(locked = true, candies = m.candies - 1)
+      case _ => m
+    }}
+    sequence(inputs.map(i => simulate(i))).flatMap {
+      _ => get.map(m => (m.coins, m.candies))
+    }
+  }
 }
 
 
@@ -145,4 +172,7 @@ object Test extends App {
   println(RNG.doubleFromMap.run(rng))
 
   println(RNG.sequence(List.fill(5){RNG.int}).run(rng))
+
+  println(State.simulateMachine(List(Coin, Turn, Turn, Coin, Coin, Turn)).run(Machine(true, 5, 0)))
+
 }
