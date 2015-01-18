@@ -81,7 +81,14 @@ object RNG {
       (f(a,b), rng3)
   }
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    (rng: RNG) =>
+      fs.foldRight((List.empty[A], rng)) { (ra, b) =>
+        val (la, rng2) = b
+        val (a, rng3) = ra(rng2)
+        (a +: la, rng3)
+      }
+  }
 
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
 }
@@ -120,4 +127,6 @@ object Test extends App {
   println(RNG.ints(5)(rng))
 
   println(RNG.doubleFromMap(rng))
+
+  println(RNG.sequence(List.fill(5){RNG.int})(rng))
 }
