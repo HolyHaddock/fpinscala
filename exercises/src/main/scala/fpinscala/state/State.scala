@@ -32,6 +32,9 @@ object RNG {
       (f(a), rng2)
     }
 
+  def mapUsingFlatmap[A, B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => unit(f(a)))
+
   @tailrec
   def nonNegativeInt(rng: RNG): (Int, RNG) = {
     val x = rng.nextInt
@@ -81,6 +84,9 @@ object RNG {
       (f(a,b), rng3)
   }
 
+  def map2UsingFlatmap[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra) { a =>  map(rb) { b => f(a,b)} }
+
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
     (rng: RNG) =>
       fs.foldRight((List.empty[A], rng)) { (ra, b) =>
@@ -97,10 +103,10 @@ object RNG {
   }
 
   def nonNegativeLessThan(n: Int): Rand[Int] = {
-    RNG.flatMap(nonNegativeInt){
+    RNG.flatMap(nonNegativeInt) {
       i =>
         val mod = i % n
-        if (i + (n-1) - mod >= 0) unit(mod) else nonNegativeLessThan(n)
+        if (i + (n - 1) - mod >= 0) unit(mod) else nonNegativeLessThan(n)
     }
   }
 }
