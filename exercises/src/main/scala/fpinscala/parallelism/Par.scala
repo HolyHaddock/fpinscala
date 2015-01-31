@@ -35,7 +35,7 @@ object Par {
           val startTime = System.currentTimeMillis()
           val ar = af.get(timeout, unit)
           val timeoutRemaining = unit.toMillis(timeout) - (System.currentTimeMillis() - startTime)
-          
+
           val br = bf.get(unit.toMillis(timeoutRemaining), TimeUnit.MILLISECONDS)
 
           f(ar, br)
@@ -50,6 +50,8 @@ object Par {
     es => es.submit(new Callable[A] { 
       def call = a(es).get
     })
+
+  def asyncF[A,B](f: A => B): A => Par[B] = (a:A) => fork(unit(f(a)))
 
   def map[A,B](pa: Par[A])(f: A => B): Par[B] = 
     map2(pa, unit(()))((a,_) => f(a))
