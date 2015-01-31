@@ -20,6 +20,29 @@ object Par {
     (es: ExecutorService) => {
       val af = a(es) 
       val bf = b(es)
+
+      new Future[C] {
+
+        override def cancel(mayInterruptIfRunning: Boolean): Boolean = af.cancel(mayInterruptIfRunning) || bf.cancel(mayInterruptIfRunning)
+
+        override def isCancelled: Boolean = af.isCancelled || bf.isCancelled
+
+        override def get(): C = f(af.get, bf.get)
+
+        override def isDone: Boolean = af.isDone && bf.isDone
+
+        override def get(timeout: Long, unit: TimeUnit): C = {
+          val startTime = System.currentTimeMillis()
+          val ar = af.get(timeout, unit)
+          val timeoutRemaining = unit.toMillis(timeout) - (System.currentTimeMillis() - startTime)
+          
+          val br = bf.get(unit.toMillis(timeoutRemaining), TimeUnit.MILLISECONDS)
+
+          f(ar, br)
+        }
+
+      }
+
       UnitFuture(f(af.get, bf.get)) // This implementation of `map2` does _not_ respect timeouts. It simply passes the `ExecutorService` on to both `Par` values, waits for the results of the Futures `af` and `bf`, applies `f` to them, and wraps them in a `UnitFuture`. In order to respect timeouts, we'd need a new `Future` implementation that records the amount of time spent evaluating `af`, then subtracts that time from the available time allocated for evaluating `bf`.
     }
   
