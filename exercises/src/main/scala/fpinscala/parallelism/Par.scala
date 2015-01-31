@@ -64,6 +64,17 @@ object Par {
   def delay[A](fa: => Par[A]): Par[A] = 
     es => fa(es)
 
+  def parMap[A,B](ps: List[A])(f: A => B): Par[List[B]] = fork(sequence(ps.map(asyncF(f))))
+
+  def sequence[A](ps: List[Par[A]]): Par[List[A]] = ps.foldRight(unit(List.empty[A])) {
+    (px, pa) =>
+      map2(px, pa) { (x, a) =>
+        x +: a
+      }
+  }
+
+
+
   def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
     es => 
       if (run(es)(cond).get) t(es) // Notice we are blocking on the result of `cond`.
