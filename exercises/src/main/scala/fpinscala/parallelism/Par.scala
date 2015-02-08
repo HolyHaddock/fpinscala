@@ -66,13 +66,17 @@ object Par {
 
   def parMap[A,B](ps: List[A])(f: A => B): Par[List[B]] = fork(sequence(ps.map(asyncF(f))))
 
-  def sequence[A](ps: List[Par[A]]): Par[List[A]] = ps.foldRight(unit(List.empty[A])) {
+  def sequence[A](ps: List[Par[A]]): Par[List[A]] = fork(ps.foldRight(unit(List.empty[A])) {
     (px, pa) =>
       map2(px, pa) { (x, a) =>
         x +: a
       }
-  }
+  })
 
+  def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] = {
+    val pars: List[Par[List[A]]] = as.map(asyncF((a: A) => if (f(a)) List(a) else List()))
+    map(sequence(pars))(_.flatten)
+  }
 
 
   def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
